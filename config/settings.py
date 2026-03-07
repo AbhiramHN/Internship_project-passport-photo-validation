@@ -1,3 +1,7 @@
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 ALLOWED_FORMATS = ["jpg", "jpeg", "png"]
 
 MAX_FILE_SIZE_KB = 300
@@ -16,10 +20,10 @@ ACCESSORY_MODEL = "yolov8n"
 
 BACKGROUND_VARIANCE_THRESHOLD = 15
 
-INPUT_IMAGE_FOLDER = "data/input_images"
+INPUT_IMAGE_FOLDER = os.path.join(BASE_DIR, "data", "input_images")
 
-UPLOAD_FOLDER = "data/uploaded_images"
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "data", "uploaded_images")
 
-ACCEPTED_FOLDER = "data/accepted"
+ACCEPTED_FOLDER = os.path.join(BASE_DIR, "data", "accepted")
 
-REJECTED_FOLDER = "data/rejected"
+REJECTED_FOLDER = os.path.join(BASE_DIR, "data", "rejected")

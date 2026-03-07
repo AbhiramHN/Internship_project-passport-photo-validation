@@ -10,13 +10,9 @@ def run_validation(image_path):
 
     reasons: list[str] = []
     metrics: dict = {}
+    validation_flow: list[str] = []
 
     def _normalize_result(result, validator_name: str):
-        """
-        Backward-compatible unpacking:
-        - (bool, [reasons])
-        - (bool, [reasons], {metrics})
-        """
         try:
             ok, msgs, m = result
         except ValueError:
@@ -32,34 +28,72 @@ def run_validation(image_path):
         return bool(ok), msgs
 
     valid, msg = _normalize_result(validate_file(image_path), "file")
+    validation_flow.append(
+        "file_validator.py validated the photo" if valid
+        else "file_validator.py invalidated the photo"
+    )
     if not valid:
         reasons.extend(msg)
 
-    # If file is corrupted/unreadable, downstream checks will crash.
     if "Corrupted or unreadable image" in reasons:
-        return {"status": "Invalid", "reasons": reasons, "metrics": metrics}
+        return {
+            "status": "Invalid",
+            "reasons": reasons,
+            "metrics": metrics,
+            "flow": validation_flow
+        }
 
     valid, msg = _normalize_result(validate_image_quality(image_path), "quality")
+    validation_flow.append(
+        "quality_validator.py validated the photo" if valid
+        else "quality_validator.py invalidated the photo"
+    )
     if not valid:
         reasons.extend(msg)
 
     valid, msg = _normalize_result(validate_face(image_path), "face")
+    validation_flow.append(
+        "face_validator.py validated the photo" if valid
+        else "face_validator.py invalidated the photo"
+    )
     if not valid:
         reasons.extend(msg)
 
     valid, msg = _normalize_result(validate_head_pose(image_path), "pose")
+    validation_flow.append(
+        "pose_validator.py validated the photo" if valid
+        else "pose_validator.py invalidated the photo"
+    )
     if not valid:
         reasons.extend(msg)
 
     valid, msg = _normalize_result(validate_background(image_path), "background")
+    validation_flow.append(
+        "background_validator.py validated the photo" if valid
+        else "background_validator.py invalidated the photo"
+    )
     if not valid:
         reasons.extend(msg)
 
     valid, msg = _normalize_result(validate_accessories(image_path), "accessories")
+    validation_flow.append(
+        "accessory_validator.py validated the photo" if valid
+        else "accessory_validator.py invalidated the photo"
+    )
     if not valid:
         reasons.extend(msg)
 
     if reasons:
-        return {"status": "Invalid", "reasons": reasons, "metrics": metrics}
+        return {
+            "status": "Invalid",
+            "reasons": reasons,
+            "metrics": metrics,
+            "flow": validation_flow
+        }
 
-    return {"status": "Valid", "reasons": [], "metrics": metrics}
+    return {
+        "status": "Valid",
+        "reasons": [],
+        "metrics": metrics,
+        "flow": validation_flow
+    }

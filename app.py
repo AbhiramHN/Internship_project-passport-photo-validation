@@ -1,66 +1,72 @@
 import streamlit as st
 import os
-from utils.image_loader import load_images_from_folder, load_image_by_index
+from utils.image_loader import load_images_from_folder
 from pipeline.validation_pipeline import run_validation
-from config.settings import UPLOAD_FOLDER
+from config.settings import UPLOAD_FOLDER, INPUT_IMAGE_FOLDER
 
 st.set_page_config(page_title="Passport Photo Validator", layout="wide")
 
-if "image_index" not in st.session_state:
-    st.session_state.image_index = 0
+st.title("Passport Photo Validator")
 
 images = load_images_from_folder()
 
-st.title("Passport Size Photo Validator")
-
-st.subheader("Dataset Image Testing")
-
-col1, col2 = st.columns(2)
+col1, col2 = st.columns([1,2])
 
 with col1:
-    if st.button("Previous"):
-        if st.session_state.image_index > 0:
-            st.session_state.image_index -= 1
+    st.subheader("Select Dataset Image")
+
+    selected_image = None
+
+    if len(images) > 0:
+        selected_image = st.selectbox(
+            "Dataset Images",
+            images
+        )
+
+    st.divider()
+
+    st.subheader("Upload Image")
+
+    uploaded_file = st.file_uploader(
+        "Upload passport photo",
+        type=["jpg","jpeg","png"]
+    )
+
+    if uploaded_file is not None:
+        save_path = os.path.join(UPLOAD_FOLDER, uploaded_file.name)
+
+        with open(save_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+
+        selected_image = save_path
 
 with col2:
-    if st.button("Next"):
-        if st.session_state.image_index < len(images) - 1:
-            st.session_state.image_index += 1
+    st.subheader("Preview")
 
-if len(images) > 0:
-    image, path = load_image_by_index(st.session_state.image_index, images)
-    st.image(image, caption=images[st.session_state.image_index], width=300)
-    if st.button("Predict"):
-        result = run_validation(path)
+    if selected_image:
 
-        if result["status"] == "Valid":
-            st.success("Valid Passport Photo")
+        if isinstance(selected_image, str) and os.path.exists(selected_image):
+            image_path = selected_image
         else:
-            st.error("Invalid Passport Photo")
-            for r in result["reasons"]:
-                st.write("-", r)
+            image_path = os.path.join(INPUT_IMAGE_FOLDER, selected_image)
 
-st.divider()
+        st.image(image_path, width=350)
 
-st.subheader("Upload Image")
+        if st.button("Validate Photo"):
 
-uploaded_file = st.file_uploader("Upload a photo", type=["jpg", "jpeg", "png"])
+            result = run_validation(image_path)
 
-if uploaded_file is not None:
+            if result["status"] == "Valid":
+                st.success("Valid Passport Photo")
+            else:
+                st.error("Invalid Passport Photo")
 
-    save_path = os.path.join(UPLOAD_FOLDER, uploaded_file.name)
+            # Print validation flow in order
+            if "flow" in result:
+                for step in result["flow"]:
+                    st.write(step)
 
-    with open(save_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
-
-    st.image(save_path, caption="Uploaded Image", width=300)
-
-    if st.button("Validate Uploaded Image"):
-        result = run_validation(save_path)
-
-        if result["status"] == "Valid":
-            st.success("Valid Passport Photo")
-        else:
-            st.error("Invalid Passport Photo")
-            for r in result["reasons"]:
-                st.write("-", r)
+            # Print reasons if invalid
+            if result["status"] == "Invalid":
+                for r in result["reasons"]:
+                    st.write("-", r)    
