@@ -19,7 +19,7 @@ def validate_file(image_path):
     try:
         with Image.open(image_path) as img:
             img.verify()
-        img = Image.open(image_path)  # reopen after verify() just for metrics
+        img = Image.open(image_path)
     except Exception:
         reasons.append("Corrupted or unreadable image")
         return False, reasons, metrics
@@ -29,19 +29,13 @@ def validate_file(image_path):
         metrics["width_px"] = int(width)
         metrics["height_px"] = int(height)
 
-        # NOTE: By user request we do NOT hard-reject on resolution or aspect here.
-        # We only compute metrics so they can be displayed in the UI if needed.
         dpi = img.info.get("dpi")
         if isinstance(dpi, tuple) and len(dpi) >= 2 and dpi[0] and dpi[1]:
-            xdpi, ydpi = float(dpi[0]), float(dpi[1])
-            metrics["dpi"] = (round(xdpi, 2), round(ydpi, 2))
+            metrics["dpi"] = (round(float(dpi[0]), 2), round(float(dpi[1]), 2))
     finally:
-        try:
-            img.close()
-        except Exception:
-            pass
+        img.close()
 
-    if len(reasons) == 0:
+    if not reasons:
         return True, [], metrics
 
     return False, reasons, metrics

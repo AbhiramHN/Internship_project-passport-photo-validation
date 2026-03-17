@@ -3,11 +3,6 @@ from config.settings import BLUR_THRESHOLD
 
 
 def validate_image_quality(image_path):
-    """
-    Image quality checks:
-    - Blur detection using Laplacian variance
-    - Added None guard for unreadable images
-    """
     reasons = []
 
     image = cv2.imread(image_path)
@@ -20,7 +15,7 @@ def validate_image_quality(image_path):
     if laplacian_var < BLUR_THRESHOLD:
         reasons.append("Image is blurred")
 
-    if len(reasons) == 0:
+    if not reasons:
         return True, []
 
     return False, reasons

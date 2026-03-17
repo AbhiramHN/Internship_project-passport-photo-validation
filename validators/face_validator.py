@@ -5,13 +5,6 @@ mp_face_detection = mp.solutions.face_detection
 
 
 def validate_face(image_path):
-    """
-    Face validation:
-    - Exactly one face must be present
-    - Added None guard for unreadable images
-    """
-    reasons = []
-
     image = cv2.imread(image_path)
     if image is None:
         return False, ["Could not read image for face check"]

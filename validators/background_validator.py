@@ -7,25 +7,10 @@ mp_selfie_segmentation = mp.solutions.selfie_segmentation
 
 
 def validate_background(image_path):
-    """
-    Robust passport background validator.
-
-    Accepts:
-    - Plain studio backgrounds
-    - Solid colors
-    - Slight lighting gradients
-
-    Rejects:
-    - Forest / grass / outdoor scenes
-    - Rooms / objects
-    - Textured walls or curtains
-    """
-
     image = cv2.imread(image_path)
     if image is None:
         return True, []
 
-    h, w, _ = image.shape
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     # --- Person segmentation ---
@@ -42,14 +27,12 @@ def validate_background(image_path):
         return True, []
 
     # --- Dominant color clustering ---
-    pixels = bg_pixels.reshape(-1, 3)
-
     try:
         kmeans = KMeans(n_clusters=3, n_init=10)
-        kmeans.fit(pixels)
+        kmeans.fit(bg_pixels.reshape(-1, 3))
 
         counts = np.bincount(kmeans.labels_)
-        dominant_ratio = counts.max() / len(pixels)
+        dominant_ratio = counts.max() / len(bg_pixels)
 
     except Exception:
         dominant_ratio = 1.0
@@ -71,10 +54,7 @@ def validate_background(image_path):
     high_edges = edge_density > 0.12
     high_texture = texture_score > 180
 
-    signals = sum([complex_color, high_edges, high_texture])
-
-    # Require at least TWO signals to reject
-    if signals >= 2:
+    if sum([complex_color, high_edges, high_texture]) >= 2:
         return False, ["Background is not plain (too busy or textured)"]
 
     return True, []

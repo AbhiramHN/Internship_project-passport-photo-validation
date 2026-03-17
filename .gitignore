@@ -7,4 +7,13 @@ __pycache__/
 .DS_Store
 *.log
 outputs/
-*.pt
+
+# Model files
+models/yolov8n.pt
+models/my_model.pt
+
+# Image folders
+data/input_images/
+data/uploaded_images/
+data/accepted/
+data/rejected/
