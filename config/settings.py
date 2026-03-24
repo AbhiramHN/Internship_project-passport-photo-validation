@@ -63,6 +63,8 @@ UPLOAD_FOLDER = os.path.join(BASE_DIR, "data", "uploaded_images")
 ACCEPTED_FOLDER = os.path.join(BASE_DIR, "data", "accepted")
 REJECTED_FOLDER = os.path.join(BASE_DIR, "data", "rejected")
 
-ACCESSORY_MODEL_CONFIDENCE = 0.60
+CAP_CONFIDENCE = 0.80
+SUNGLASS_CONFIDENCE = 0.75
 
 CAP_MODEL_PATH = os.path.join(BASE_DIR, "models", "cap_detection.pt")
+SUNGLASS_MODEL_PATH = os.path.join(BASE_DIR, "models", "Sunglass.pt")
