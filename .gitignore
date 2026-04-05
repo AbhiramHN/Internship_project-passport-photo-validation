@@ -1,19 +1,11 @@
-venv/
+.venv/
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
+data/
+uploads/
+*.pt
 .env
-.DS_Store
-*.log
-outputs/
 
 # Model files
 models/yolov8n.pt
 models/my_model.pt
-
-# Image folders
-data/input_images/
-data/uploaded_images/
-data/accepted/
-data/rejected/
