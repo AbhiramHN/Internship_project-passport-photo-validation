@@ -1,5 +1,5 @@
 opencv-python>=4.8.0
-mediapipe>=0.10.14
+mediapipe==0.10.14
 numpy>=1.24.0
 Pillow>=10.0.0
 ultralytics>=8.0.0
