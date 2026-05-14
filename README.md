@@ -63,7 +63,7 @@ http://127.0.0.1:5000
 
 ### Start Frontend (PHP)
 
-1. Copy the `frontend` folder to:
+1. Copy the `frontend` files (index.php and result.php) to:
 
 ```
 C:\xampp\htdocs\passport\
